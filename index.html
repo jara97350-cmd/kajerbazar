@@ -476,7 +476,24 @@ import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase
 import {getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {getFirestore,collection,addDoc,getDocs,getDoc,doc,setDoc,query,where,orderBy,limit,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const app=initializeApp({
+const app=initializeApp({ // কাজ ডিলিট করার ফাংশন
+async function deleteJob(jobId) {
+    if (confirm("আপনি কি নিশ্চিতভাবে এই কাজটি মুছে ফেলতে চান?")) {
+        try {
+            await db.collection("jobs").doc(jobId).delete();
+            alert("কাজটি সফলভাবে মুছে ফেলা হয়েছে!");
+            location.reload();
+        } catch (error) {
+            alert("দুঃখিত, কাজটি ডিলিট করা যায়নি।");
+        }
+    }
+}
+
+// কাজ এডিট বা মডিফাই করার ফাংশন
+function editJob(jobId) {
+    alert("এই কাজটি এডিট করার অপশন প্রস্তুত করা হচ্ছে। কাজের আইডি: " + jobId);
+}
+
   apiKey:"AIzaSyAfxJXAjZlF37r78Wel8RpR00f2rvaPW5w",
   authDomain:"kajerbazar-feee8.firebaseapp.com",
   projectId:"kajerbazar-feee8",
