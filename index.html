@@ -30,12 +30,38 @@ label{font-size:14px;color:var(--mut);display:block;margin-bottom:2px}
 .stat{font-size:14px;color:var(--mut);margin:0 0 8px}
 :focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style> body { font-family: 'Hind Siliguri', sans-serif; } </style>
 </head>
 <body>
-<header>
-  <div class="logo">Kajer<span>Bazar</span></div>
-  <button id="authBtn" class="btn">Google দিয়ে লগইন</button>
+<!-- নতুন KajMahal Header শুরু -->
+<header class="bg-[#0b5c32] text-white py-3 px-4 md:px-8 flex justify-between items-center sticky top-0 z-50">
+    <!-- লোগো অংশ -->
+    <div class="flex items-center gap-2">
+        <div class="bg-yellow-400 p-2 rounded text-[#0b5c32] font-bold text-xl">💼</div>
+        <div>
+            <h1 class="text-2xl font-bold leading-none m-0">KajMahal</h1>
+            <p class="text-[10px] md:text-xs text-yellow-300 m-0 mt-1">কাজ খুঁজুন • কাজ দিন • এগিয়ে চলুন</p>
+        </div>
+    </div>
+    
+    <!-- ডানদিকের বাটন -->
+    <div class="flex items-center gap-3">
+        <!-- লোকেশন (শুধু ডেস্কটপে দেখাবে) -->
+        <div class="hidden md:flex items-center gap-1 bg-[#094a28] px-3 py-2 rounded-full cursor-pointer border border-[#147a46]">
+            <span class="text-xl">📍</span>
+            <span class="text-sm leading-tight">আপনার লোকেশন<br><span class="font-bold">ঢাকা বিভাগ </span></span>
+            <span class="text-xs ml-1">▼</span>
+        </div>
+        <!-- লগইন বাটন -->
+        <button id="authBtn" class="bg-white text-gray-800 px-3 md:px-4 py-2 rounded-full font-semibold flex items-center gap-2 hover:bg-gray-100 transition shadow-md text-sm">
+            <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google">
+            <span class="hidden md:block">Google দিয়ে সাইন ইন</span>
+        </button>
+    </div>
 </header>
+<!-- নতুন KajMahal Header শেষ -->
 <main>
   <div class="box">
     <h2>আপনার এলাকা বাছুন</h2>
