@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KajerBazar – কাজের বাজার</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f4ee;--ink:#1c2b26;--green:#0f5c4d;--gold:#f2b632;--card:#fff;--line:#dcd8cc;--mut:#5d6b66}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Hind Siliguri',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+header{background:var(--green);color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px;position:sticky;top:0;z-index:5}
+.logo{font-size:22px;font-weight:700}.logo span{color:var(--gold)}
+button{font:inherit;cursor:pointer;border:0;border-radius:8px;padding:9px 14px;font-weight:600}
+.btn{background:var(--gold);color:#222}.btn2{background:var(--green);color:#fff}
+header button{padding:7px 12px;font-size:14px}
+main{max-width:720px;margin:auto;padding:14px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:14px}
+h2{font-size:18px;margin:0 0 10px}
+select,input,textarea{width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:8px;margin-bottom:8px;background:#fff;color:var(--ink)}
+label{font-size:14px;color:var(--mut);display:block;margin-bottom:2px}
+.ad{border:2px dashed var(--line);color:var(--mut);text-align:center;padding:14px;border-radius:10px;margin-bottom:14px;font-size:14px}
+.job h3{margin:0 0 4px;font-size:17px}
+.tag{display:inline-block;background:#e6f0ed;color:var(--green);padding:2px 9px;border-radius:99px;font-size:13px;margin-right:4px}
+.mut{color:var(--mut);font-size:14px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.row a{text-decoration:none;padding:8px 12px;border-radius:8px;font-weight:600;font-size:14px}
+.wa{background:#25d366;color:#fff}.call{background:var(--green);color:#fff}
+.msg{text-align:center;color:var(--mut);padding:18px}
+.stat{font-size:14px;color:var(--mut);margin:0 0 8px}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Kajer<span>Bazar</span></div>
+  <button id="authBtn" class="btn">Google দিয়ে লগইন</button>
+</header>
+<main>
+  <div class="box">
+    <h2>আপনার এলাকা বাছুন</h2>
+    <label>বিভাগ</label><select id="fDiv"></select>
+    <label>জেলা</label><select id="fDist"></select>
+    <label>উপজেলা</label><select id="fUp"></select>
+  </div>
+
+  <div class="ad">বিজ্ঞাপনের জায়গা (এখানে পরে AdSense বা লোকাল বিজ্ঞাপন বসবে)</div>
+
+  <button id="postBtn" class="btn2" style="width:100%;margin-bottom:14px">+ কাজ পোস্ট করুন</button>
+
+  <form id="pf" class="box" hidden>
+    <h2>নতুন কাজ পোস্ট করুন</h2>
+    <label>কাজের নাম</label><input id="pTitle" required maxlength="80" placeholder="যেমন: ইলেকট্রিশিয়ান দরকার">
+    <label>ধরন</label>
+    <select id="pCat"><option>ইলেকট্রিশিয়ান</option><option>রাজমিস্ত্রি</option><option>কাঠমিস্ত্রি</option><option>প্লাম্বার</option><option>টিউটর</option><option>ড্রাইভার</option><option>কৃষিকাজ</option><option>অন্যান্য</option></select>
+    <label>বিবরণ</label><textarea id="pDesc" rows="3" required maxlength="500" placeholder="কাজটা কী, কবে লাগবে"></textarea>
+    <label>পারিশ্রমিক (টাকা, লিখতে না চাইলে খালি রাখুন)</label><input id="pWage" maxlength="30">
+    <label>বিভাগ</label><select id="pDiv"></select>
+    <label>জেলা</label><select id="pDist"></select>
+    <label>উপজেলা</label><select id="pUp"></select>
+    <input id="pUpText" placeholder="উপজেলার নাম লিখুন" hidden>
+    <label>গ্রাম/এলাকা (যেমন: বেলছড়ি)</label><input id="pAddr" required maxlength="80">
+    <label>ফোন / হোয়াটসঅ্যাপ নম্বর (শুধু লগইন করা মানুষ দেখবে)</label><input id="pPhone" type="tel" required maxlength="15" placeholder="017XXXXXXXX">
+    <button class="btn2" type="submit" style="width:100%">পোস্ট করুন</button>
+  </form>
+
+  <p class="stat" id="stat"></p>
+  <div id="list"></div>
+</main>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,collection,addDoc,getDocs,getDoc,doc,setDoc,query,where,orderBy,limit,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const app=initializeApp({
+  apiKey:"AIzaSyAfxJXAjZlF37r78Wel8RpR00f2rvaPW5w",
+  authDomain:"kajerbazar-feee8.firebaseapp.com",
+  projectId:"kajerbazar-feee8",
+  storageBucket:"kajerbazar-feee8.firebasestorage.app",
+  messagingSenderId:"56570766146",
+  appId:"1:56570766146:web:dab1197bd712b39160dedb"
+});
+const auth=getAuth(app),db=getFirestore(app);
+
+/* ---- এলাকার তালিকা ---- */
+const DIV={
+"ঢাকা":["ঢাকা","গাজীপুর","কিশোরগঞ্জ","মানিকগঞ্জ","মুন্সীগঞ্জ","নারায়ণগঞ্জ","নরসিংদী","টাঙ্গাইল","ফরিদপুর","গোপালগঞ্জ","মাদারীপুর","রাজবাড়ী","শরীয়তপুর"],
+"চট্টগ্রাম":["চট্টগ্রাম","কক্সবাজার","কুমিল্লা","ব্রাহ্মণবাড়িয়া","চাঁদপুর","নোয়াখালী","ফেনী","লক্ষ্মীপুর","খাগড়াছড়ি","রাঙ্গামাটি","বান্দরবান"],
+"রাজশাহী":["রাজশাহী","বগুড়া","জয়পুরহাট","নওগাঁ","নাটোর","চাঁপাইনবাবগঞ্জ","পাবনা","সিরাজগঞ্জ"],
+"খুলনা":["খুলনা","বাগেরহাট","চুয়াডাঙ্গা","যশোর","ঝিনাইদহ","কুষ্টিয়া","মাগুরা","মেহেরপুর","নড়াইল","সাতক্ষীরা"],
+"বরিশাল":["বরিশাল","বরগুনা","ভোলা","ঝালকাঠি","পটুয়াখালী","পিরোজপুর"],
+"সিলেট":["সিলেট","হবিগঞ্জ","মৌলভীবাজার","সুনামগঞ্জ"],
+"রংপুর":["রংপুর","দিনাজপুর","গাইবান্ধা","কুড়িগ্রাম","লালমনিরহাট","নীলফামারী","পঞ্চগড়","ঠাকুরগাঁও"],
+"ময়মনসিংহ":["ময়মনসিংহ","জামালপুর","নেত্রকোণা","শেরপুর"]};
+/* উপজেলা: এখন শুধু এই ৫টি জেলার আছে, বাকিগুলো পরে যোগ হবে */
+const UP={
+"খাগড়াছড়ি":["খাগড়াছড়ি সদর","দীঘিনালা","লক্ষ্মীছড়ি","মহালছড়ি","মানিকছড়ি","মাটিরাঙ্গা","পানছড়ি","রামগড়","গুইমারা"],
+"রাঙ্গামাটি":["রাঙ্গামাটি সদর","কাপ্তাই","কাউখালী","জুরাছড়ি","নানিয়ারচর","বাঘাইছড়ি","বরকল","বিলাইছড়ি","রাজস্থলী","লংগদু"],
+"বান্দরবান":["বান্দরবান সদর","থানচি","রুমা","লামা","আলীকদম","নাইক্ষ্যংছড়ি","রোয়াংছড়ি"],
+"কক্সবাজার":["কক্সবাজার সদর","চকরিয়া","কুতুবদিয়া","টেকনাফ","উখিয়া","পেকুয়া","মহেশখালী","রামু"],
+"ফেনী":["ফেনী সদর","ছাগলনাইয়া","দাগনভূঁইয়া","পরশুরাম","ফুলগাজী","সোনাগাজী"]};
+
+const $=id=>document.getElementById(id);
+const fill=(el,arr,first)=>{el.innerHTML="";if(first!==null){el.add(new Option(first,""))}arr.forEach(v=>el.add(new Option(v,v)))};
+
+/* ফিল্টার */
+fill($("fDiv"),Object.keys(DIV),"সব বিভাগ");
+fill($("fDist"),[],"সব জেলা");fill($("fUp"),[],"সব উপজেলা");
+$("fDiv").onchange=()=>{fill($("fDist"),DIV[$("fDiv").value]||[],"সব জেলা");fill($("fUp"),[],"সব উপজেলা");load()};
+$("fDist").onchange=()=>{fill($("fUp"),UP[$("fDist").value]||[],"সব উপজেলা");load()};
+$("fUp").onchange=load;
+
+/* পোস্ট ফর্ম */
+fill($("pDiv"),Object.keys(DIV),null);
+const pd=()=>{fill($("pDist"),DIV[$("pDiv").value],null);pu()};
+const pu=()=>{const u=UP[$("pDist").value];$("pUp").hidden=!u;$("pUpText").hidden=!!u;$("pUpText").required=!u;if(u)fill($("pUp"),u,null)};
+$("pDiv").onchange=pd;$("pDist").onchange=pu;pd();
+
+/* লগইন */
+let user=null;
+onAuthStateChanged(auth,u=>{user=u;$("authBtn").textContent=u?"লগআউট":"Google দিয়ে লগইন"});
+$("authBtn").onclick=()=>user?signOut(auth):signInWithPopup(auth,new GoogleAuthProvider()).catch(e=>alert("লগইন হয়নি: "+e.code));
+$("postBtn").onclick=async()=>{
+  if(!user){try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(e){return alert("আগে লগইন করুন")}}
+  $("pf").hidden=!$("pf").hidden;
+};
+$("pf").onsubmit=async e=>{
+  e.preventDefault();
+  const up=UP[$("pDist").value]?$("pUp").value:$("pUpText").value.trim();
+  try{
+    const r=await addDoc(collection(db,"jobs"),{
+      title:$("pTitle").value.trim(),cat:$("pCat").value,desc:$("pDesc").value.trim(),wage:$("pWage").value.trim(),
+      division:$("pDiv").value,district:$("pDist").value,upazila:up,addr:$("pAddr").value.trim(),
+      uid:user.uid,createdAt:serverTimestamp()});
+    await setDoc(doc(db,"contacts",r.id),{phone:$("pPhone").value.trim(),uid:user.uid});
+    e.target.reset();pd();$("pf").hidden=true;alert("কাজ পোস্ট হয়েছে");load();
+  }catch(err){alert("পোস্ট হয়নি: "+err.code)}
+};
+
+/* কাজের তালিকা */
+const tag=t=>{const s=document.createElement("span");s.className="tag";s.textContent=t;return s};
+async function load(){
+  const d=$("fDiv").value,di=$("fDist").value,u=$("fUp").value;
+  $("list").innerHTML='<p class="msg">লোড হচ্ছে...</p>';
+  try{
+    const c=collection(db,"jobs");
+    const q=di?query(c,where("district","==",di),limit(100)):d?query(c,where("division","==",d),limit(100)):query(c,orderBy("createdAt","desc"),limit(50));
+    let items=(await getDocs(q)).docs.map(x=>({id:x.id,...x.data()}));
+    if(u)items=items.filter(j=>j.upazila===u);
+    items.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+    $("stat").textContent=items.length+"টি কাজ পাওয়া গেছে";
+    $("list").innerHTML="";
+    if(!items.length){$("list").innerHTML='<p class="msg">এই এলাকায় এখনো কোনো কাজ নেই। প্রথম কাজটা আপনিই পোস্ট করুন।</p>';return}
+    items.forEach(j=>{
+      const b=document.createElement("div");b.className="box job";
+      const h=document.createElement("h3");h.textContent=j.title;
+      const t=document.createElement("div");t.append(tag(j.cat),tag(j.district+(j.upazila?" · "+j.upazila:"")));
+      const p=document.createElement("p");p.textContent=j.desc;
+      const m=document.createElement("div");m.className="mut";m.textContent="ঠিকানা: "+j.addr+(j.wage?" | পারিশ্রমিক: "+j.wage:"");
+      const r=document.createElement("div");r.className="row";
+      const bt=document.createElement("button");bt.className="btn2";bt.textContent="যোগাযোগ দেখুন";
+      bt.onclick=async()=>{
+        if(!user){try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(e){return alert("যোগাযোগের নম্বর দেখতে লগইন করুন")}}
+        try{
+          const s=await getDoc(doc(db,"contacts",j.id));const ph=(s.data()?.phone||"").replace(/\D/g,"");
+          const w=ph.startsWith("88")?ph:"88"+ph;
+          r.innerHTML="";
+          const a1=document.createElement("a");a1.className="call";a1.href="tel:+"+w;a1.textContent="কল: "+ph;
+          const a2=document.createElement("a");a2.className="wa";a2.href="https://wa.me/"+w;a2.target="_blank";a2.rel="noopener";a2.textContent="হোয়াটসঅ্যাপ";
+          r.append(a1,a2);
+        }catch(e){alert("নম্বর পাওয়া যায়নি")}
+      };
+      r.append(bt);b.append(h,t,p,m,r);$("list").append(b);
+    });
+  }catch(e){$("list").innerHTML='<p class="msg">কাজ লোড হয়নি ('+e.code+')</p>'}
+}
+load();
+</script>
+</body>
+</html>
