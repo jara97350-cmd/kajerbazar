@@ -319,8 +319,22 @@ label{font-size:14px;color:var(--mut);display:block;margin-bottom:2px}
     <button class="btn2" type="submit" style="width:100%">পোস্ট করুন</button>
   </form>
 
-  <p class="stat" id="stat"></p>
-  <div id="list"></div>
+      <!-- সাম্প্রতিক কাজ সেকশন শুরু -->
+    <div class="mx-4 md:mx-12 mb-16 mt-8">
+        <!-- সেকশন হেডার -->
+        <div class="flex items-center justify-between mb-4 border-b border-gray-200 pb-3">
+            <h3 class="text-2xl font-bold text-gray-800 border-l-4 border-[#0b5c32] pl-3">সাম্প্রতিক কাজগুলো</h3>
+        </div>
+        
+        <!-- মোট কাজের সংখ্যা দেখানোর জায়গা (আপনার আগের id="stat" রাখা হয়েছে) -->
+        <div class="mb-6">
+            <p class="stat text-sm text-gray-600 bg-white inline-block px-4 py-2 rounded-lg border border-gray-200 shadow-sm font-medium" id="stat"></p>
+        </div>
+        
+        <!-- কাজের লিস্ট দেখানোর মূল জায়গা (আপনার আগের id="list" রাখা হয়েছে) -->
+        <div id="list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"></div>
+    </div>
+    <!-- সাম্প্রতিক কাজ সেকশন শেষ -->
 </main>
 <!-- লোকেশন ডাইনামিক করার জাভাস্ক্রিপ্ট শুরু -->
 <script>
